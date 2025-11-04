@@ -1,0 +1,148 @@
+{% extends 'travels/base.html' %}
+
+{% block title %}Relatórios - Sistema de Viagens{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-bar-chart"></i> Relatórios e Estatísticas</h2>
+    </div>
+</div>
+
+<!-- Estatísticas Gerais -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Estatísticas Gerais</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Total de Viagens no Sistema:</strong> {{ total_viagens }}</p>
+
+                <h6 class="mt-3">Viagens por Status:</h6>
+                <ul>
+                    {% for item in viagens_por_status %}
+                    <li>{{ item.status }}: {{ item.total }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Despesas por Categoria -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Despesas por Categoria</h5>
+            </div>
+            <div class="card-body">
+                {% if despesas_por_categoria %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Categoria</th>
+                                <th class="text-end">Total (R$)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in despesas_por_categoria %}
+                            <tr>
+                                <td>{{ item.categoria }}</td>
+                                <td class="text-end">{{ item.total|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Nenhuma despesa registrada.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Uso de Veículos -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Uso de Veículos</h5>
+            </div>
+            <div class="card-body">
+                {% if uso_veiculos %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th class="text-end">KM Total</th>
+                                <th class="text-end">Custo (R$)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in uso_veiculos %}
+                            <tr>
+                                <td>{{ item.tipo_veiculo }}</td>
+                                <td class="text-end">{{ item.total_km|floatformat:2 }}</td>
+                                <td class="text-end">{{ item.total_custo|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Nenhum uso de veículo registrado.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Viagens por Centro de Custo -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Viagens por Centro de Custo</h5>
+            </div>
+            <div class="card-body">
+                {% if viagens_por_centro %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Centro de Custo</th>
+                                <th class="text-end">Nº Viagens</th>
+                                <th class="text-end">Total Despesas (R$)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in viagens_por_centro %}
+                            <tr>
+                                <td>{{ item.centro_custo__nome }}</td>
+                                <td class="text-end">{{ item.total }}</td>
+                                <td class="text-end">{{ item.total_despesas|floatformat:2|default:"0.00" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Nenhuma viagem registrada.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <a href="{% url 'relatorio_detalhado' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-file-earmark-text"></i> Ver Relatório Detalhado
+        </a>
+    </div>
+</div>
+
+{% endblock %}

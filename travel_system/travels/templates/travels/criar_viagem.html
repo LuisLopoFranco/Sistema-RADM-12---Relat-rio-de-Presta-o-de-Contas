@@ -1,0 +1,148 @@
+{% extends 'travels/base.html' %}
+
+{% block title %}Nova Viagem - Sistema de Viagens{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-plus-circle"></i> Nova Requisição de Viagem</h2>
+        <p class="text-muted">Preencha os dados da sua viagem</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card shadow">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <h5 class="border-bottom pb-2 mb-3">Informações Básicas</h5>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Centro de Custo *</label>
+                            {{ form.centro_custo }}
+                            {% if form.centro_custo.errors %}
+                            <div class="text-danger small">{{ form.centro_custo.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Destino *</label>
+                            {{ form.destino }}
+                            {% if form.destino.errors %}
+                            <div class="text-danger small">{{ form.destino.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Trecho Original *</label>
+                            {{ form.trecho_original }}
+                            {% if form.trecho_original.errors %}
+                            <div class="text-danger small">{{ form.trecho_original.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Trecho Alterado (opcional)</label>
+                            {{ form.trecho_alterado }}
+                            <small class="text-muted">Preencher apenas se houver alteração de rota</small>
+                        </div>
+                    </div>
+
+                    <h5 class="border-bottom pb-2 mb-3 mt-4">Motivo da Viagem</h5>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Motivo/Finalidade *</label>
+                            {{ form.motivo }}
+                            {% if form.motivo.errors %}
+                            <div class="text-danger small">{{ form.motivo.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Classificação do Motivo *</label>
+                            {{ form.classificacao_motivo }}
+                            {% if form.classificacao_motivo.errors %}
+                            <div class="text-danger small">{{ form.classificacao_motivo.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Especificar Outro Motivo</label>
+                            {{ form.outro_motivo_descricao }}
+                            <small class="text-muted">Obrigatório se classificação for "Outro"</small>
+                        </div>
+                    </div>
+
+                    <h5 class="border-bottom pb-2 mb-3 mt-4">Datas</h5>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Data da Autorização *</label>
+                            {{ form.data_autorizacao }}
+                            {% if form.data_autorizacao.errors %}
+                            <div class="text-danger small">{{ form.data_autorizacao.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Data da Saída *</label>
+                            {{ form.data_saida }}
+                            {% if form.data_saida.errors %}
+                            <div class="text-danger small">{{ form.data_saida.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Data da Chegada *</label>
+                            {{ form.data_chegada }}
+                            {% if form.data_chegada.errors %}
+                            <div class="text-danger small">{{ form.data_chegada.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <h5 class="border-bottom pb-2 mb-3 mt-4">Aprovação e Financeiro</h5>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Aprovador *</label>
+                            {{ form.aprovador }}
+                            {% if form.aprovador.errors %}
+                            <div class="text-danger small">{{ form.aprovador.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Adiantamento (R$)</label>
+                            {{ form.adiantamento }}
+                            {% if form.adiantamento.errors %}
+                            <div class="text-danger small">{{ form.adiantamento.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Salvar e Continuar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

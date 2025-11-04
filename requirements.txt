@@ -1,0 +1,14 @@
+# Django Framework
+Django>=4.2,<5.0
+
+# Database
+psycopg2-binary>=2.9.0  # PostgreSQL adapter (opcional, use se preferir PostgreSQL)
+
+# Pillow para processamento de imagens
+Pillow>=10.0.0
+
+# Utilitários
+python-decouple>=3.8  # Para gerenciar variáveis de ambiente
+
+# Desenvolvimento (opcional)
+django-debug-toolbar>=4.0.0

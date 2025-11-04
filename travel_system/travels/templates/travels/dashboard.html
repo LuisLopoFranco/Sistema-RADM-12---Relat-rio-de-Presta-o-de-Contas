@@ -1,0 +1,355 @@
+{% extends 'travels/base.html' %}
+
+{% block title %}Dashboard - Sistema de Viagens{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Dashboard</h2>
+        <p class="text-muted">
+            Bem-vindo, <strong>{{ user.get_full_name }}</strong> ({{ user.get_user_type_display }})
+        </p>
+    </div>
+</div>
+
+{% if user.user_type == 'SOLICITANTE' %}
+<!-- Dashboard do Solicitante -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card card-stat shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total de Viagens</h6>
+                        <h3 class="mb-0">{{ total_viagens }}</h3>
+                    </div>
+                    <i class="bi bi-suitcase text-primary" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-stat shadow-sm" style="border-left-color: #ffc107;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Pendentes</h6>
+                        <h3 class="mb-0">{{ viagens_pendentes }}</h3>
+                    </div>
+                    <i class="bi bi-clock text-warning" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-stat shadow-sm" style="border-left-color: #28a745;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Aprovadas</h6>
+                        <h3 class="mb-0">{{ viagens_aprovadas }}</h3>
+                    </div>
+                    <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Minhas Últimas Viagens</h5>
+            </div>
+            <div class="card-body">
+                {% if minhas_viagens %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Destino</th>
+                                <th>Data Saída</th>
+                                <th>Data Chegada</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for viagem in minhas_viagens %}
+                            <tr>
+                                <td>{{ viagem.destino }}</td>
+                                <td>{{ viagem.data_saida|date:"d/m/Y" }}</td>
+                                <td>{{ viagem.data_chegada|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if viagem.status == 'RASCUNHO' %}
+                                    <span class="badge bg-secondary">{{ viagem.get_status_display }}</span>
+                                    {% elif viagem.status == 'PENDENTE' %}
+                                    <span class="badge bg-warning text-dark">{{ viagem.get_status_display }}</span>
+                                    {% elif viagem.status == 'APROVADA' %}
+                                    <span class="badge bg-success">{{ viagem.get_status_display }}</span>
+                                    {% elif viagem.status == 'REPROVADA' %}
+                                    <span class="badge bg-danger">{{ viagem.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'detalhe_viagem' viagem.pk %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                    {% if viagem.status == 'RASCUNHO' %}
+                                    <a href="{% url 'editar_viagem' viagem.pk %}" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-end">
+                    <a href="{% url 'minhas_viagens' %}" class="btn btn-outline-primary">Ver Todas</a>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Você ainda não possui viagens registradas.</p>
+                <a href="{% url 'criar_viagem' %}" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-circle"></i> Criar Nova Viagem
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif user.user_type == 'APROVADOR' %}
+<!-- Dashboard do Aprovador -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card card-stat shadow-sm" style="border-left-color: #ffc107;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Aguardando Aprovação</h6>
+                        <h3 class="mb-0">{{ total_pendentes }}</h3>
+                    </div>
+                    <i class="bi bi-hourglass text-warning" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-stat shadow-sm" style="border-left-color: #28a745;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Aprovadas</h6>
+                        <h3 class="mb-0">{{ total_aprovadas }}</h3>
+                    </div>
+                    <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-stat shadow-sm" style="border-left-color: #dc3545;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Reprovadas</h6>
+                        <h3 class="mb-0">{{ total_reprovadas }}</h3>
+                    </div>
+                    <i class="bi bi-x-circle text-danger" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Viagens Pendentes de Aprovação</h5>
+                {% if total_pendentes > 0 %}
+                <span class="badge bg-warning text-dark">{{ total_pendentes }} pendente(s)</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if viagens_para_aprovar %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Solicitante</th>
+                                <th>Destino</th>
+                                <th>Data Saída</th>
+                                <th>Data Chegada</th>
+                                <th>Criado em</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for viagem in viagens_para_aprovar %}
+                            <tr>
+                                <td>{{ viagem.solicitante.get_full_name }}</td>
+                                <td>{{ viagem.destino }}</td>
+                                <td>{{ viagem.data_saida|date:"d/m/Y" }}</td>
+                                <td>{{ viagem.data_chegada|date:"d/m/Y" }}</td>
+                                <td>{{ viagem.criado_em|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <a href="{% url 'detalhe_viagem' viagem.pk %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                    <a href="{% url 'aprovar_viagem' viagem.pk %}" class="btn btn-sm btn-success">
+                                        <i class="bi bi-check-circle"></i> Aprovar
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Não há viagens pendentes de aprovação no momento.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif user.user_type == 'ADMINISTRADOR' %}
+<!-- Dashboard do Administrador -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card card-stat shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total de Viagens</h6>
+                        <h3 class="mb-0">{{ total_viagens }}</h3>
+                    </div>
+                    <i class="bi bi-suitcase text-primary" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card card-stat shadow-sm" style="border-left-color: #ffc107;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Pendentes</h6>
+                        <h3 class="mb-0">{{ viagens_pendentes }}</h3>
+                    </div>
+                    <i class="bi bi-clock text-warning" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card card-stat shadow-sm" style="border-left-color: #28a745;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Aprovadas</h6>
+                        <h3 class="mb-0">{{ viagens_aprovadas }}</h3>
+                    </div>
+                    <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card card-stat shadow-sm" style="border-left-color: #17a2b8;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Usuários</h6>
+                        <h3 class="mb-0">{{ total_usuarios }}</h3>
+                    </div>
+                    <i class="bi bi-people text-info" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Total de Despesas Aprovadas</h5>
+                <h2 class="text-success">R$ {{ total_despesas|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Últimas Viagens do Sistema</h5>
+            </div>
+            <div class="card-body">
+                {% if ultimas_viagens %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Solicitante</th>
+                                <th>Destino</th>
+                                <th>Data Saída</th>
+                                <th>Status</th>
+                                <th>Aprovador</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for viagem in ultimas_viagens %}
+                            <tr>
+                                <td>{{ viagem.solicitante.get_full_name }}</td>
+                                <td>{{ viagem.destino }}</td>
+                                <td>{{ viagem.data_saida|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if viagem.status == 'RASCUNHO' %}
+                                    <span class="badge bg-secondary">{{ viagem.get_status_display }}</span>
+                                    {% elif viagem.status == 'PENDENTE' %}
+                                    <span class="badge bg-warning text-dark">{{ viagem.get_status_display }}</span>
+                                    {% elif viagem.status == 'APROVADA' %}
+                                    <span class="badge bg-success">{{ viagem.get_status_display }}</span>
+                                    {% elif viagem.status == 'REPROVADA' %}
+                                    <span class="badge bg-danger">{{ viagem.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ viagem.aprovador.get_full_name }}</td>
+                                <td>
+                                    <a href="{% url 'detalhe_viagem' viagem.pk %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-end">
+                    <a href="{% url 'relatorio_detalhado' %}" class="btn btn-outline-primary">Ver Relatório Completo</a>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Não há viagens registradas no sistema.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

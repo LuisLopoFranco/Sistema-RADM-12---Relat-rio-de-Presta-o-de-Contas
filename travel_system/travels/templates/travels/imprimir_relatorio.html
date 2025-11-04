@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Prestação de Contas - {{ viagem.destino }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #000;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .signature-box {
+            margin-top: 50px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="margin-bottom: 20px;">
+        <button onclick="window.print()" style="padding: 10px 20px; font-size: 14px; cursor: pointer;">
+            Imprimir Relatório
+        </button>
+        <button onclick="window.close()" style="padding: 10px 20px; font-size: 14px; cursor: pointer; margin-left: 10px;">
+            Fechar
+        </button>
+    </div>
+
+    <div class="header">
+        <h1>RELATÓRIO DE PRESTAÇÃO DE CONTAS</h1>
+        <h2>Sistema de Gestão de Viagens</h2>
+    </div>
+
+    <!-- Cabeçalho -->
+    <div class="section">
+        <h3>DADOS DO COLABORADOR</h3>
+        <table>
+            <tr>
+                <th width="30%">Nome:</th>
+                <td>{{ viagem.solicitante.get_full_name }}</td>
+            </tr>
+            <tr>
+                <th>Cargo:</th>
+                <td>{{ viagem.solicitante.cargo }}</td>
+            </tr>
+            <tr>
+                <th>Centro de Custo:</th>
+                <td>{{ viagem.centro_custo }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Informações da Viagem -->
+    <div class="section">
+        <h3>INFORMAÇÕES DA VIAGEM</h3>
+        <table>
+            <tr>
+                <th width="30%">Destino:</th>
+                <td>{{ viagem.destino }}</td>
+            </tr>
+            <tr>
+                <th>Trecho Original:</th>
+                <td>{{ viagem.trecho_original }}</td>
+            </tr>
+            {% if viagem.trecho_alterado %}
+            <tr>
+                <th>Trecho Alterado:</th>
+                <td>{{ viagem.trecho_alterado }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <th>Motivo/Finalidade:</th>
+                <td>{{ viagem.motivo }}</td>
+            </tr>
+            <tr>
+                <th>Classificação:</th>
+                <td>{{ viagem.get_classificacao_motivo_display }}</td>
+            </tr>
+            <tr>
+                <th>Data de Autorização:</th>
+                <td>{{ viagem.data_autorizacao|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+                <th>Data de Saída:</th>
+                <td>{{ viagem.data_saida|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+                <th>Data de Chegada:</th>
+                <td>{{ viagem.data_chegada|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+                <th>Aprovador:</th>
+                <td>{{ viagem.aprovador.get_full_name }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Despesas -->
+    <div class="section">
+        <h3>DESPESAS REALIZADAS</h3>
+        {% if despesas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Categoria</th>
+                    <th>Descrição</th>
+                    <th>Data</th>
+                    <th class="text-right">Valor (R$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for despesa in despesas %}
+                <tr>
+                    <td>{{ despesa.get_categoria_display }}</td>
+                    <td>{{ despesa.descricao }}</td>
+                    <td>{{ despesa.data_despesa|date:"d/m/Y" }}</td>
+                    <td class="text-right">{{ despesa.valor|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhuma despesa registrada.</p>
+        {% endif %}
+    </div>
+
+    <!-- Veículos -->
+    {% if veiculos %}
+    <div class="section">
+        <h3>USO DE VEÍCULO PRÓPRIO</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Placa</th>
+                    <th>Modelo</th>
+                    <th class="text-right">KM Rodado</th>
+                    <th class="text-right">Valor/Litro</th>
+                    <th class="text-right">Custo (R$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for veiculo in veiculos %}
+                <tr>
+                    <td>{{ veiculo.get_tipo_veiculo_display }}</td>
+                    <td>{{ veiculo.placa }}</td>
+                    <td>{{ veiculo.modelo }}</td>
+                    <td class="text-right">{{ veiculo.km_rodado|floatformat:2 }}</td>
+                    <td class="text-right">{{ veiculo.valor_litro|floatformat:2 }}</td>
+                    <td class="text-right">{{ veiculo.custo_calculado|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Resumo Financeiro -->
+    <div class="section">
+        <h3>RESUMO FINANCEIRO</h3>
+        <table>
+            <tr>
+                <th width="60%">Total das Despesas:</th>
+                <td class="text-right"><strong>R$ {{ total_despesas|floatformat:2 }}</strong></td>
+            </tr>
+            <tr>
+                <th>Adiantamento:</th>
+                <td class="text-right">R$ {{ viagem.adiantamento|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <th>Saldo (Total - Adiantamento):</th>
+                <td class="text-right"><strong>R$ {{ saldo|floatformat:2 }}</strong></td>
+            </tr>
+            <tr style="background-color: #e8f5e9;">
+                <th>Valor a ser Reembolsado ao Usuário:</th>
+                <td class="text-right"><strong>R$ {{ reembolso|floatformat:2 }}</strong></td>
+            </tr>
+            <tr style="background-color: #ffebee;">
+                <th>Valor a ser Restituído à Cooperativa (Cód. 261):</th>
+                <td class="text-right"><strong>R$ {{ restituicao|floatformat:2 }}</strong></td>
+            </tr>
+        </table>
+
+        {% if viagem.solicitante.conta_corrente %}
+        <h4>Dados Bancários para Crédito/Débito:</h4>
+        <table>
+            <tr>
+                <th width="30%">Banco:</th>
+                <td>{{ viagem.solicitante.banco }}</td>
+            </tr>
+            <tr>
+                <th>Agência:</th>
+                <td>{{ viagem.solicitante.agencia }}</td>
+            </tr>
+            <tr>
+                <th>Conta Corrente:</th>
+                <td>{{ viagem.solicitante.conta_corrente }}</td>
+            </tr>
+        </table>
+        {% endif %}
+    </div>
+
+    <!-- Aprovação -->
+    {% if aprovacao %}
+    <div class="section">
+        <h3>PARECER E APROVAÇÃO</h3>
+        <table>
+            <tr>
+                <th width="30%">Status:</th>
+                <td><strong>{{ aprovacao.get_status_display }}</strong></td>
+            </tr>
+            <tr>
+                <th>Aprovador:</th>
+                <td>{{ aprovacao.aprovador.get_full_name }}</td>
+            </tr>
+            <tr>
+                <th>Data da Aprovação:</th>
+                <td>{{ aprovacao.data_aprovacao|date:"d/m/Y H:i" }}</td>
+            </tr>
+            <tr>
+                <th>Parecer:</th>
+                <td>{{ aprovacao.parecer }}</td>
+            </tr>
+            <tr>
+                <th>Autoriza Débito/Crédito:</th>
+                <td>{% if aprovacao.autoriza_debito_credito %}SIM{% else %}NÃO{% endif %}</td>
+            </tr>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Assinaturas -->
+    <div class="signature-box">
+        <div style="margin-top: 50px;">
+            <p>_______________________________________________</p>
+            <p><strong>Assinatura do Colaborador</strong></p>
+            <p>Data: ____/____/________</p>
+        </div>
+
+        <div style="margin-top: 50px;">
+            <p>_______________________________________________</p>
+            <p><strong>Assinatura do Superior Hierárquico</strong></p>
+            <p>Data: ____/____/________</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #666;">
+        <p>Documento gerado eletronicamente em {{ "now"|date:"d/m/Y H:i" }}</p>
+        <p>Sistema de Gestão de Viagens - Relatório RADM-12</p>
+    </div>
+</body>
+</html>

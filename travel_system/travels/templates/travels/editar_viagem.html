@@ -1,0 +1,300 @@
+{% extends 'travels/base.html' %}
+
+{% block title %}Editar Viagem - Sistema de Viagens{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-pencil"></i> Editar Requisição de Viagem</h2>
+        <p class="text-muted">Viagem para {{ viagem.destino }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <ul class="nav nav-tabs" id="viagemTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="dados-tab" data-bs-toggle="tab" data-bs-target="#dados" type="button">
+                    <i class="bi bi-info-circle"></i> Dados da Viagem
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="despesas-tab" data-bs-toggle="tab" data-bs-target="#despesas" type="button">
+                    <i class="bi bi-cash"></i> Despesas
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="veiculos-tab" data-bs-toggle="tab" data-bs-target="#veiculos" type="button">
+                    <i class="bi bi-car-front"></i> Veículos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="anexos-tab" data-bs-toggle="tab" data-bs-target="#anexos" type="button">
+                    <i class="bi bi-paperclip"></i> Anexos
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content p-4 border border-top-0">
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Dados da Viagem -->
+                <div class="tab-pane fade show active" id="dados">
+                    <h5 class="mb-3">Informações Básicas</h5>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Centro de Custo *</label>
+                            {{ form.centro_custo }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Destino *</label>
+                            {{ form.destino }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Trecho Original *</label>
+                            {{ form.trecho_original }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Trecho Alterado</label>
+                            {{ form.trecho_alterado }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Motivo/Finalidade *</label>
+                            {{ form.motivo }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Classificação *</label>
+                            {{ form.classificacao_motivo }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Outro Motivo</label>
+                            {{ form.outro_motivo_descricao }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Data Autorização *</label>
+                            {{ form.data_autorizacao }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Data Saída *</label>
+                            {{ form.data_saida }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Data Chegada *</label>
+                            {{ form.data_chegada }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Aprovador *</label>
+                            {{ form.aprovador }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Adiantamento (R$)</label>
+                            {{ form.adiantamento }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Despesas -->
+                <div class="tab-pane fade" id="despesas">
+                    <h5 class="mb-3">Despesas da Viagem</h5>
+                    <p class="text-muted">Adicione todas as despesas realizadas durante a viagem</p>
+
+                    {{ expense_formset.management_form }}
+
+                    <div id="expense-formset">
+                        {% for form in expense_formset %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Categoria</label>
+                                        {{ form.categoria }}
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label">Descrição</label>
+                                        {{ form.descricao }}
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Valor (R$)</label>
+                                        {{ form.valor }}
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Data</label>
+                                        {{ form.data_despesa }}
+                                    </div>
+                                </div>
+                                {% if form.id %}
+                                <div class="form-check mt-2">
+                                    {{ form.DELETE }}
+                                    <label class="form-check-label text-danger">
+                                        Remover esta despesa
+                                    </label>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Veículos -->
+                <div class="tab-pane fade" id="veiculos">
+                    <h5 class="mb-3">Uso de Veículo Próprio</h5>
+                    <p class="text-muted">Registre o uso de veículo próprio (Carro 6 Km/L ou Moto 15 Km/L)</p>
+
+                    {{ vehicle_formset.management_form }}
+
+                    <div id="vehicle-formset">
+                        {% for form in vehicle_formset %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Tipo de Veículo</label>
+                                        {{ form.tipo_veiculo }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Placa</label>
+                                        {{ form.placa }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Modelo</label>
+                                        {{ form.modelo }}
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label">KM Rodado</label>
+                                        {{ form.km_rodado }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Valor do Litro (R$)</label>
+                                        {{ form.valor_litro }}
+                                    </div>
+                                </div>
+                                {% if form.id %}
+                                <div class="form-check mt-2">
+                                    {{ form.DELETE }}
+                                    <label class="form-check-label text-danger">
+                                        Remover este veículo
+                                    </label>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>Cálculo automático:</strong>
+                        <ul class="mb-0">
+                            <li>Carro: 6 Km/L - Custo = (KM rodado / 6) × Valor do litro</li>
+                            <li>Moto: 15 Km/L - Custo = (KM rodado / 15) × Valor do litro</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Anexos -->
+                <div class="tab-pane fade" id="anexos">
+                    <h5 class="mb-3">Comprovantes e Anexos</h5>
+
+                    {% if viagem.anexos.exists %}
+                    <div class="table-responsive mb-3">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Arquivo</th>
+                                    <th>Descrição</th>
+                                    <th>Enviado em</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for anexo in viagem.anexos.all %}
+                                <tr>
+                                    <td>{{ anexo.get_tipo_display }}</td>
+                                    <td><a href="{{ anexo.arquivo.url }}" target="_blank">{{ anexo.arquivo.name }}</a></td>
+                                    <td>{{ anexo.descricao }}</td>
+                                    <td>{{ anexo.enviado_em|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Nenhum anexo enviado ainda.</p>
+                    {% endif %}
+
+                    <a href="{% url 'upload_comprovante' viagem.pk %}" class="btn btn-success">
+                        <i class="bi bi-upload"></i> Fazer Upload de Comprovante
+                    </a>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'minhas_viagens' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Salvar Alterações
+                        </button>
+                        {% if viagem.status == 'RASCUNHO' and viagem.despesas.exists %}
+                        <a href="{% url 'submeter_viagem' viagem.pk %}" class="btn btn-success" onclick="return confirm('Tem certeza que deseja submeter esta viagem para aprovação? Após submeter, não será possível editar.')">
+                            <i class="bi bi-send"></i> Submeter para Aprovação
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5>Resumo Financeiro</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="mb-1 text-muted">Total de Despesas</p>
+                        <h4 class="text-primary">R$ {{ viagem.calcular_total_despesas|floatformat:2 }}</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1 text-muted">Adiantamento</p>
+                        <h4>R$ {{ viagem.adiantamento|floatformat:2 }}</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1 text-muted">Reembolso ao Usuário</p>
+                        <h4 class="text-success">R$ {{ viagem.calcular_reembolso|floatformat:2 }}</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1 text-muted">Restituição à Cooperativa</p>
+                        <h4 class="text-danger">R$ {{ viagem.calcular_restituicao|floatformat:2 }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

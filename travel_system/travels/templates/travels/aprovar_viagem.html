@@ -1,0 +1,110 @@
+{% extends 'travels/base.html' %}
+
+{% block title %}Aprovar Viagem{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-check-circle"></i> Aprovar/Reprovar Viagem</h2>
+        <p class="text-muted">{{ viagem.destino }} - {{ viagem.solicitante.get_full_name }}</p>
+    </div>
+</div>
+
+<!-- Resumo da Viagem -->
+<div class="card mb-3">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Resumo da Viagem</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Solicitante:</strong> {{ viagem.solicitante.get_full_name }}</p>
+                <p><strong>Cargo:</strong> {{ viagem.solicitante.cargo }}</p>
+                <p><strong>Destino:</strong> {{ viagem.destino }}</p>
+                <p><strong>Motivo:</strong> {{ viagem.motivo }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Data Saída:</strong> {{ viagem.data_saida|date:"d/m/Y" }}</p>
+                <p><strong>Data Chegada:</strong> {{ viagem.data_chegada|date:"d/m/Y" }}</p>
+                <p><strong>Centro de Custo:</strong> {{ viagem.centro_custo }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resumo Financeiro -->
+<div class="card mb-3">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Resumo Financeiro</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <h6 class="text-muted">Total de Despesas</h6>
+                <h4 class="text-primary">R$ {{ total_despesas|floatformat:2 }}</h4>
+            </div>
+            <div class="col-md-3">
+                <h6 class="text-muted">Adiantamento</h6>
+                <h4>R$ {{ viagem.adiantamento|floatformat:2 }}</h4>
+            </div>
+            <div class="col-md-3">
+                <h6 class="text-muted">Reembolso ao Usuário</h6>
+                <h4 class="text-success">R$ {{ reembolso|floatformat:2 }}</h4>
+            </div>
+            <div class="col-md-3">
+                <h6 class="text-muted">Restituição à Cooperativa</h6>
+                <h4 class="text-danger">R$ {{ restituicao|floatformat:2 }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formulário de Aprovação -->
+<div class="card mb-3">
+    <div class="card-header bg-warning">
+        <h5 class="mb-0">Parecer de Aprovação</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Status *</label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                <div class="text-danger small">{{ form.status.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Parecer *</label>
+                {{ form.parecer }}
+                {% if form.parecer.errors %}
+                <div class="text-danger small">{{ form.parecer.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3 form-check">
+                {{ form.autoriza_debito_credito }}
+                <label class="form-check-label">
+                    Autorizo o débito/crédito conforme demonstrado acima na conta corrente
+                </label>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'viagens_para_aprovar' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="bi bi-check-circle"></i> Confirmar Decisão
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <strong>Atenção:</strong> Esta decisão não poderá ser alterada após confirmação.
+</div>
+
+{% endblock %}

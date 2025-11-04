@@ -1,0 +1,247 @@
+{% extends 'travels/base.html' %}
+
+{% block title %}Detalhes da Viagem - Sistema de Viagens{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-eye"></i> Detalhes da Viagem</h2>
+        <p class="text-muted">{{ viagem.destino }}</p>
+    </div>
+    <div class="col-auto">
+        {% if viagem.status == 'RASCUNHO' %}
+        <span class="badge bg-secondary" style="font-size: 1rem;">{{ viagem.get_status_display }}</span>
+        {% elif viagem.status == 'PENDENTE' %}
+        <span class="badge bg-warning text-dark" style="font-size: 1rem;">{{ viagem.get_status_display }}</span>
+        {% elif viagem.status == 'APROVADA' %}
+        <span class="badge bg-success" style="font-size: 1rem;">{{ viagem.get_status_display }}</span>
+        {% elif viagem.status == 'REPROVADA' %}
+        <span class="badge bg-danger" style="font-size: 1rem;">{{ viagem.get_status_display }}</span>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col">
+        <a href="{% url 'imprimir_relatorio' viagem.pk %}" class="btn btn-outline-primary" target="_blank">
+            <i class="bi bi-printer"></i> Imprimir Relatório
+        </a>
+        {% if viagem.solicitante == user and viagem.status == 'RASCUNHO' %}
+        <a href="{% url 'editar_viagem' viagem.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+        {% endif %}
+        {% if user.user_type == 'APROVADOR' and viagem.status == 'PENDENTE' and viagem.aprovador == user %}
+        <a href="{% url 'aprovar_viagem' viagem.pk %}" class="btn btn-success">
+            <i class="bi bi-check-circle"></i> Aprovar/Reprovar
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Informações da Viagem -->
+<div class="card mb-3">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Informações da Viagem</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Solicitante:</strong> {{ viagem.solicitante.get_full_name }}</p>
+                <p><strong>Cargo:</strong> {{ viagem.solicitante.cargo }}</p>
+                <p><strong>Centro de Custo:</strong> {{ viagem.centro_custo }}</p>
+                <p><strong>Destino:</strong> {{ viagem.destino }}</p>
+                <p><strong>Trecho Original:</strong> {{ viagem.trecho_original }}</p>
+                {% if viagem.trecho_alterado %}
+                <p><strong>Trecho Alterado:</strong> <span class="text-warning">{{ viagem.trecho_alterado }}</span></p>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <p><strong>Motivo:</strong> {{ viagem.motivo }}</p>
+                <p><strong>Classificação:</strong> {{ viagem.get_classificacao_motivo_display }}</p>
+                {% if viagem.outro_motivo_descricao %}
+                <p><strong>Especificação:</strong> {{ viagem.outro_motivo_descricao }}</p>
+                {% endif %}
+                <p><strong>Data de Autorização:</strong> {{ viagem.data_autorizacao|date:"d/m/Y" }}</p>
+                <p><strong>Data de Saída:</strong> {{ viagem.data_saida|date:"d/m/Y" }}</p>
+                <p><strong>Data de Chegada:</strong> {{ viagem.data_chegada|date:"d/m/Y" }}</p>
+                <p><strong>Aprovador:</strong> {{ viagem.aprovador.get_full_name }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Despesas -->
+<div class="card mb-3">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Despesas Realizadas</h5>
+    </div>
+    <div class="card-body">
+        {% if despesas %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Categoria</th>
+                        <th>Descrição</th>
+                        <th>Data</th>
+                        <th class="text-end">Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for despesa in despesas %}
+                    <tr>
+                        <td>{{ despesa.get_categoria_display }}</td>
+                        <td>{{ despesa.descricao }}</td>
+                        <td>{{ despesa.data_despesa|date:"d/m/Y" }}</td>
+                        <td class="text-end">R$ {{ despesa.valor|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">Nenhuma despesa registrada.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Veículos -->
+{% if veiculos %}
+<div class="card mb-3">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">Uso de Veículo Próprio</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Placa</th>
+                        <th>Modelo</th>
+                        <th class="text-end">KM Rodado</th>
+                        <th class="text-end">Valor/Litro</th>
+                        <th class="text-end">Custo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for veiculo in veiculos %}
+                    <tr>
+                        <td>{{ veiculo.get_tipo_veiculo_display }}</td>
+                        <td>{{ veiculo.placa }}</td>
+                        <td>{{ veiculo.modelo }}</td>
+                        <td class="text-end">{{ veiculo.km_rodado|floatformat:2 }}</td>
+                        <td class="text-end">R$ {{ veiculo.valor_litro|floatformat:2 }}</td>
+                        <td class="text-end">R$ {{ veiculo.custo_calculado|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Resumo Financeiro -->
+<div class="card mb-3">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Resumo Financeiro</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <h6 class="text-muted">Total de Despesas</h6>
+                <h4 class="text-primary">R$ {{ total_despesas|floatformat:2 }}</h4>
+            </div>
+            <div class="col-md-3">
+                <h6 class="text-muted">Adiantamento</h6>
+                <h4>R$ {{ viagem.adiantamento|floatformat:2 }}</h4>
+            </div>
+            <div class="col-md-3">
+                <h6 class="text-muted">Reembolso ao Usuário</h6>
+                <h4 class="text-success">R$ {{ reembolso|floatformat:2 }}</h4>
+            </div>
+            <div class="col-md-3">
+                <h6 class="text-muted">Restituição à Cooperativa</h6>
+                <h4 class="text-danger">R$ {{ restituicao|floatformat:2 }}</h4>
+            </div>
+        </div>
+
+        {% if viagem.solicitante.conta_corrente %}
+        <hr>
+        <h6 class="mt-3">Dados Bancários para Reembolso</h6>
+        <p class="mb-0">
+            <strong>Banco:</strong> {{ viagem.solicitante.banco }} |
+            <strong>Agência:</strong> {{ viagem.solicitante.agencia }} |
+            <strong>Conta:</strong> {{ viagem.solicitante.conta_corrente }}
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Comprovantes -->
+{% if anexos %}
+<div class="card mb-3">
+    <div class="card-header bg-warning">
+        <h5 class="mb-0">Comprovantes Anexados</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Arquivo</th>
+                        <th>Descrição</th>
+                        <th>Enviado em</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for anexo in anexos %}
+                    <tr>
+                        <td>{{ anexo.get_tipo_display }}</td>
+                        <td><a href="{{ anexo.arquivo.url }}" target="_blank" class="btn btn-sm btn-primary">
+                            <i class="bi bi-download"></i> Baixar
+                        </a></td>
+                        <td>{{ anexo.descricao }}</td>
+                        <td>{{ anexo.enviado_em|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Aprovação -->
+{% if viagem.aprovacao %}
+<div class="card mb-3">
+    <div class="card-header {% if viagem.aprovacao.status == 'APROVADA' %}bg-success{% else %}bg-danger{% endif %} text-white">
+        <h5 class="mb-0">Parecer da Aprovação</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Status:</strong> {{ viagem.aprovacao.get_status_display }}</p>
+        <p><strong>Aprovador:</strong> {{ viagem.aprovacao.aprovador.get_full_name }}</p>
+        <p><strong>Data:</strong> {{ viagem.aprovacao.data_aprovacao|date:"d/m/Y H:i" }}</p>
+        <p><strong>Parecer:</strong></p>
+        <p class="border-start border-3 ps-3">{{ viagem.aprovacao.parecer }}</p>
+        <p><strong>Autoriza débito/crédito:</strong>
+            {% if viagem.aprovacao.autoriza_debito_credito %}
+            <span class="badge bg-success">Sim</span>
+            {% else %}
+            <span class="badge bg-danger">Não</span>
+            {% endif %}
+        </p>
+    </div>
+</div>
+{% endif %}
+
+<div class="d-flex justify-content-between">
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
+
+{% endblock %}

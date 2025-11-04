@@ -1,0 +1,71 @@
+{% extends 'travels/base.html' %}
+
+{% block title %}Minhas Viagens{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-list-ul"></i> Minhas Viagens</h2>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'criar_viagem' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nova Viagem
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if viagens %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Destino</th>
+                        <th>Data Saída</th>
+                        <th>Data Chegada</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for viagem in viagens %}
+                    <tr>
+                        <td>{{ viagem.destino }}</td>
+                        <td>{{ viagem.data_saida|date:"d/m/Y" }}</td>
+                        <td>{{ viagem.data_chegada|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if viagem.status == 'RASCUNHO' %}
+                            <span class="badge bg-secondary">{{ viagem.get_status_display }}</span>
+                            {% elif viagem.status == 'PENDENTE' %}
+                            <span class="badge bg-warning text-dark">{{ viagem.get_status_display }}</span>
+                            {% elif viagem.status == 'APROVADA' %}
+                            <span class="badge bg-success">{{ viagem.get_status_display }}</span>
+                            {% elif viagem.status == 'REPROVADA' %}
+                            <span class="badge bg-danger">{{ viagem.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'detalhe_viagem' viagem.pk %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-eye"></i> Ver
+                            </a>
+                            {% if viagem.status == 'RASCUNHO' %}
+                            <a href="{% url 'editar_viagem' viagem.pk %}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">Você ainda não possui viagens registradas.</p>
+        <a href="{% url 'criar_viagem' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Criar Nova Viagem
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
