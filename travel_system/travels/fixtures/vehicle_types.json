@@ -1,0 +1,102 @@
+[
+  {
+    "model": "travels.vehicletype",
+    "pk": 1,
+    "fields": {
+      "nome": "Carro Popular",
+      "consumo_km_litro": "12.00",
+      "ativo": true,
+      "descricao": "Carros populares como Gol, Uno, HB20, etc."
+    }
+  },
+  {
+    "model": "travels.vehicletype",
+    "pk": 2,
+    "fields": {
+      "nome": "Carro Médio",
+      "consumo_km_litro": "10.00",
+      "ativo": true,
+      "descricao": "Carros de porte médio como Civic, Corolla, etc."
+    }
+  },
+  {
+    "model": "travels.vehicletype",
+    "pk": 3,
+    "fields": {
+      "nome": "Carro SUV",
+      "consumo_km_litro": "8.00",
+      "ativo": true,
+      "descricao": "SUVs e veículos grandes"
+    }
+  },
+  {
+    "model": "travels.vehicletype",
+    "pk": 4,
+    "fields": {
+      "nome": "Carro Flex (Gasolina)",
+      "consumo_km_litro": "11.00",
+      "ativo": true,
+      "descricao": "Carros Flex abastecidos com gasolina"
+    }
+  },
+  {
+    "model": "travels.vehicletype",
+    "pk": 5,
+    "fields": {
+      "nome": "Carro Flex (Etanol)",
+      "consumo_km_litro": "7.50",
+      "ativo": true,
+      "descricao": "Carros Flex abastecidos com etanol"
+    }
+  },
+  {
+    "model": "travels.vehicletype",
+    "pk": 6,
+    "fields": {
+      "nome": "Moto até 160cc",
+      "consumo_km_litro": "35.00",
+      "ativo": true,
+      "descricao": "Motos de baixa cilindrada"
+    }
+  },
+  {
+    "model": "travels.vehicletype",
+    "pk": 7,
+    "fields": {
+      "nome": "Moto 160cc a 300cc",
+      "consumo_km_litro": "25.00",
+      "ativo": true,
+      "descricao": "Motos de média cilindrada"
+    }
+  },
+  {
+    "model": "travels.vehicletype",
+    "pk": 8,
+    "fields": {
+      "nome": "Moto acima de 300cc",
+      "consumo_km_litro": "18.00",
+      "ativo": true,
+      "descricao": "Motos de alta cilindrada"
+    }
+  },
+  {
+    "model": "travels.vehicletype",
+    "pk": 9,
+    "fields": {
+      "nome": "Carro Híbrido",
+      "consumo_km_litro": "18.00",
+      "ativo": true,
+      "descricao": "Carros com motor híbrido (elétrico + combustão)"
+    }
+  },
+  {
+    "model": "travels.vehicletype",
+    "pk": 10,
+    "fields": {
+      "nome": "Caminhonete/Pickup",
+      "consumo_km_litro": "7.00",
+      "ativo": true,
+      "descricao": "Caminhonetes e pickups"
+    }
+  }
+]

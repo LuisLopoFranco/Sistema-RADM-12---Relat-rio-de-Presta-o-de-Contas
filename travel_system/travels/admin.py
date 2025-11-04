@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
     User, CostCenter, TravelRequest, Expense,
-    VehicleTrip, VehicleLog, Approval, Attachment
+    VehicleType, VehicleTrip, VehicleLog, Approval, Attachment
 )
 
 
@@ -29,6 +29,23 @@ class CostCenterAdmin(admin.ModelAdmin):
     list_display = ['codigo', 'nome', 'ativo']
     list_filter = ['ativo']
     search_fields = ['codigo', 'nome']
+
+
+@admin.register(VehicleType)
+class VehicleTypeAdmin(admin.ModelAdmin):
+    """Administração de Tipos de Veículo"""
+    list_display = ['nome', 'consumo_km_litro', 'ativo']
+    list_filter = ['ativo']
+    search_fields = ['nome', 'descricao']
+    fieldsets = (
+        (None, {
+            'fields': ('nome', 'consumo_km_litro', 'ativo')
+        }),
+        ('Informações Adicionais', {
+            'fields': ('descricao',),
+            'classes': ('collapse',)
+        }),
+    )
 
 
 class ExpenseInline(admin.TabularInline):

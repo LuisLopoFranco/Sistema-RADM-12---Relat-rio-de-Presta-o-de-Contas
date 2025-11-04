@@ -199,11 +199,30 @@ class Expense(models.Model):
     """
     CATEGORIA_CHOICES = [
         ('DIARIAS', 'Diárias e Extras de Hotel'),
+        ('HOSPEDAGEM', 'Hospedagem'),
         ('REFEICOES', 'Refeições/Lanches'),
-        ('PASSAGENS', 'Passagens'),
-        ('TAXI', 'Táxi/Ônibus'),
+        ('CAFE_MANHA', 'Café da Manhã'),
+        ('ALMOCO', 'Almoço'),
+        ('JANTAR', 'Jantar'),
+        ('PASSAGENS_AEREAS', 'Passagens Aéreas'),
+        ('PASSAGENS_RODOVIARIAS', 'Passagens Rodoviárias'),
+        ('PASSAGENS', 'Passagens (Outras)'),
+        ('TAXI', 'Táxi'),
+        ('UBER_APP', 'Uber/App de Transporte'),
+        ('ONIBUS', 'Ônibus'),
+        ('METRO_TREM', 'Metrô/Trem'),
+        ('ESTACIONAMENTO', 'Estacionamento'),
+        ('PEDAGIO', 'Pedágio'),
+        ('COMBUSTIVEL', 'Combustível'),
         ('TELEFONEMAS', 'Telefonemas'),
-        ('OUTRAS', 'Outras'),
+        ('INTERNET', 'Internet/Dados Móveis'),
+        ('CORREIO', 'Correio/Sedex'),
+        ('MATERIAL_ESCRITORIO', 'Material de Escritório'),
+        ('INSCRICAO_EVENTO', 'Inscrição em Evento/Curso'),
+        ('DOCUMENTACAO', 'Documentação/Taxas'),
+        ('LAVANDERIA', 'Lavanderia'),
+        ('GORJETAS', 'Gorjetas'),
+        ('OUTRAS', 'Outras Despesas'),
     ]
 
     viagem = models.ForeignKey(
@@ -242,30 +261,47 @@ class Expense(models.Model):
             raise ValidationError('Descrição é obrigatória para categoria "Outras"')
 
 
+class VehicleType(models.Model):
+    """
+    Tipo de Veículo configurável com consumo personalizado
+    Permite ao administrador definir diferentes tipos de veículos
+    """
+    nome = models.CharField(max_length=100, unique=True, verbose_name='Nome do Veículo')
+    consumo_km_litro = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+        verbose_name='Consumo (Km/L)',
+        help_text='Quantos quilômetros o veículo faz por litro'
+    )
+    ativo = models.BooleanField(default=True, verbose_name='Ativo')
+    descricao = models.TextField(blank=True, verbose_name='Descrição')
+
+    class Meta:
+        verbose_name = 'Tipo de Veículo'
+        verbose_name_plural = 'Tipos de Veículo'
+        ordering = ['nome']
+
+    def __str__(self):
+        return f"{self.nome} ({self.consumo_km_litro} Km/L)"
+
+
 class VehicleTrip(models.Model):
     """
     Viagem realizada com veículo próprio
-    Calcula automaticamente o custo baseado em km rodado e consumo padrão
+    Calcula automaticamente o custo baseado em km rodado e consumo configurado
     """
-    TIPO_VEICULO = [
-        ('CARRO', 'Carro (6 Km/L)'),
-        ('MOTO', 'Moto (15 Km/L)'),
-    ]
-
-    # Constantes de consumo
-    CONSUMO_CARRO = Decimal('6.0')  # km por litro
-    CONSUMO_MOTO = Decimal('15.0')  # km por litro
-
     viagem = models.ForeignKey(
         TravelRequest,
         on_delete=models.CASCADE,
         related_name='viagens_veiculo',
         verbose_name='Viagem'
     )
-    tipo_veiculo = models.CharField(
-        max_length=10,
-        choices=TIPO_VEICULO,
-        verbose_name='Tipo de Veículo'
+    tipo_veiculo = models.ForeignKey(
+        VehicleType,
+        on_delete=models.PROTECT,
+        verbose_name='Tipo de Veículo',
+        limit_choices_to={'ativo': True}
     )
     placa = models.CharField(max_length=10, verbose_name='Placa')
     modelo = models.CharField(max_length=100, verbose_name='Modelo')
@@ -295,14 +331,14 @@ class VehicleTrip(models.Model):
         verbose_name_plural = 'Viagens com Veículo Próprio'
 
     def __str__(self):
-        return f"{self.get_tipo_veiculo_display()} - {self.placa} - {self.km_rodado}km"
+        return f"{self.tipo_veiculo.nome} - {self.placa} - {self.km_rodado}km"
 
     def calcular_custo(self):
         """
         Calcula o custo do deslocamento:
         custo = (km_rodado / consumo) * valor_litro
         """
-        consumo = self.CONSUMO_CARRO if self.tipo_veiculo == 'CARRO' else self.CONSUMO_MOTO
+        consumo = self.tipo_veiculo.consumo_km_litro
         litros_gastos = self.km_rodado / consumo
         return litros_gastos * self.valor_litro
 
