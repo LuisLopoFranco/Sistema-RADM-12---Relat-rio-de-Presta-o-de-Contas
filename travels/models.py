@@ -232,7 +232,7 @@ class Expense(models.Model):
         verbose_name='Viagem'
     )
     categoria = models.CharField(
-        max_length=20,
+        max_length=32,
         choices=CATEGORIA_CHOICES,
         verbose_name='Categoria'
     )

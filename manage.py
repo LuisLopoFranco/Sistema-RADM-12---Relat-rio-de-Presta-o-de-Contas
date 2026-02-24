@@ -6,6 +6,12 @@ import sys
 
 def main():
     """Run administrative tasks."""
+    # Ensure inner project package is on sys.path so imports like
+    # `travel_system.settings` resolve when the repo has an extra
+    # top-level `travel_system/` folder (project layout: travel_system/travel_system)
+    project_root = os.path.dirname(__file__)
+    sys.path.insert(0, os.path.join(project_root, 'travel_system'))
+
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'travel_system.settings')
     try:
         from django.core.management import execute_from_command_line
