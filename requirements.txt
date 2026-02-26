@@ -1,5 +1,6 @@
 # Django Framework
-Django>=4.2,<5.0
+Django>=4.2,<5.0; python_version < "3.14"
+Django>=5.1,<6.0; python_version >= "3.14"
 
 # Database
 psycopg2-binary>=2.9.0  # PostgreSQL adapter (opcional, use se preferir PostgreSQL)

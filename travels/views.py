@@ -72,7 +72,7 @@ def dashboard(request):
         ).count()
 
     elif user.user_type == 'APROVADOR':
-        # Aprovador: viagens pendentes de aprovação
+        # Aprovador: viagens pendentes de aprovação (todas atribuídas a ele)
         context['viagens_para_aprovar'] = TravelRequest.objects.filter(
             aprovador=user, status='PENDENTE'
         ).order_by('-criado_em')
@@ -119,7 +119,7 @@ def minhas_viagens(request):
 def criar_viagem(request):
     """Criar nova requisição de viagem"""
     if request.method == 'POST':
-        form = TravelRequestForm(request.POST)
+        form = TravelRequestForm(request.POST, user=request.user)
         if form.is_valid():
             viagem = form.save(commit=False)
             viagem.solicitante = request.user
@@ -127,7 +127,7 @@ def criar_viagem(request):
             messages.success(request, 'Viagem criada com sucesso!')
             return redirect('editar_viagem', pk=viagem.pk)
     else:
-        form = TravelRequestForm()
+        form = TravelRequestForm(user=request.user)
 
     return render(request, 'travels/criar_viagem.html', {'form': form})
 
@@ -148,7 +148,7 @@ def editar_viagem(request, pk):
         return redirect('detalhe_viagem', pk=pk)
 
     if request.method == 'POST':
-        form = TravelRequestForm(request.POST, instance=viagem)
+        form = TravelRequestForm(request.POST, instance=viagem, user=request.user)
         expense_formset = ExpenseFormSet(request.POST, instance=viagem)
         vehicle_formset = VehicleTripFormSet(request.POST, instance=viagem)
 
@@ -159,7 +159,7 @@ def editar_viagem(request, pk):
             messages.success(request, 'Viagem atualizada com sucesso!')
             return redirect('editar_viagem', pk=pk)
     else:
-        form = TravelRequestForm(instance=viagem)
+        form = TravelRequestForm(instance=viagem, user=request.user)
         expense_formset = ExpenseFormSet(instance=viagem)
         vehicle_formset = VehicleTripFormSet(instance=viagem)
 
@@ -211,11 +211,6 @@ def submeter_viagem(request, pk):
     if viagem.status != 'RASCUNHO':
         messages.warning(request, 'Esta viagem já foi submetida.')
         return redirect('detalhe_viagem', pk=pk)
-
-    # Validar se tem despesas
-    if not viagem.despesas.exists():
-        messages.error(request, 'Adicione pelo menos uma despesa antes de submeter.')
-        return redirect('editar_viagem', pk=pk)
 
     viagem.status = 'PENDENTE'
     viagem.save()

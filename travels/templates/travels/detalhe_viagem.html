@@ -30,6 +30,10 @@
         <a href="{% url 'editar_viagem' viagem.pk %}" class="btn btn-warning">
             <i class="bi bi-pencil"></i> Editar
         </a>
+        <a href="{% url 'submeter_viagem' viagem.pk %}" class="btn btn-success"
+           onclick="return confirm('Tem certeza que deseja enviar esta viagem para aprovação? Após enviar, não será possível editar.')">
+            <i class="bi bi-send"></i> Enviar para Aprovação
+        </a>
         {% endif %}
         {% if user.user_type == 'APROVADOR' and viagem.status == 'PENDENTE' and viagem.aprovador == user %}
         <a href="{% url 'aprovar_viagem' viagem.pk %}" class="btn btn-success">
@@ -38,6 +42,13 @@
         {% endif %}
     </div>
 </div>
+
+{% if viagem.solicitante == user and viagem.status == 'RASCUNHO' %}
+<div class="alert alert-info mb-3">
+    <i class="bi bi-info-circle"></i>
+    <strong>Viagem em rascunho.</strong> Clique em <strong>"Enviar para Aprovação"</strong> quando estiver pronto.
+</div>
+{% endif %}
 
 <!-- Informações da Viagem -->
 <div class="card mb-3">

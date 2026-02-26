@@ -15,12 +15,20 @@ def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'travel_system.settings')
     try:
         from django.core.management import execute_from_command_line
+        import django
     except ImportError as exc:
         raise ImportError(
             "Couldn't import Django. Are you sure it's installed and "
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+
+    if sys.version_info >= (3, 14) and django.VERSION < (5, 1):
+        raise RuntimeError(
+            "Python 3.14+ requer Django 5.1+ para evitar erros no template admin. "
+            "Atualize as dependências com: pip install -r requirements.txt"
+        )
+
     execute_from_command_line(sys.argv)
 
 

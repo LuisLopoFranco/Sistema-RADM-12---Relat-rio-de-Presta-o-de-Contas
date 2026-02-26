@@ -26,8 +26,8 @@ Sistema web completo em Python/Django para gerenciamento de viagens corporativas
 
 ## Requisitos
 
-- Python 3.8 ou superior
-- Django 4.2 ou superior
+- Python 3.8 a 3.13 com Django 4.2.x
+- Python 3.14+ com Django 5.1+
 - Navegador web moderno
 
 ## Instalação

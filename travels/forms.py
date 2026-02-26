@@ -72,10 +72,12 @@ class TravelRequestForm(forms.ModelForm):
             'adiantamento': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
-        # Filtrar apenas aprovadores
-        self.fields['aprovador'].queryset = User.objects.filter(user_type='APROVADOR')
+        # Listar todos os aprovadores disponíveis
+        self.fields['aprovador'].queryset = User.objects.filter(
+            user_type='APROVADOR'
+        )
 
     def clean(self):
         cleaned_data = super().clean()
@@ -114,6 +116,11 @@ class ExpenseForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+
+        # Se nenhum campo foi preenchido, pular validação (formulário extra vazio)
+        if not any(cleaned_data.get(f) for f in ['categoria', 'descricao', 'valor', 'data_despesa']):
+            return cleaned_data
+
         categoria = cleaned_data.get('categoria')
         descricao = cleaned_data.get('descricao')
 
@@ -136,6 +143,13 @@ class VehicleTripForm(forms.ModelForm):
             'km_rodado': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'valor_litro': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Se nenhum campo foi preenchido, pular validação (formulário extra vazio)
+        if not any(cleaned_data.get(f) for f in ['tipo_veiculo', 'placa', 'modelo', 'km_rodado', 'valor_litro']):
+            return cleaned_data
+        return cleaned_data
 
 
 class VehicleLogForm(forms.ModelForm):

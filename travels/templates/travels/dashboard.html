@@ -102,6 +102,10 @@
                                     <a href="{% url 'editar_viagem' viagem.pk %}" class="btn btn-sm btn-warning">
                                         <i class="bi bi-pencil"></i> Editar
                                     </a>
+                                    <a href="{% url 'submeter_viagem' viagem.pk %}" class="btn btn-sm btn-success"
+                                       onclick="return confirm('Enviar esta viagem para aprovação?')">
+                                        <i class="bi bi-send"></i> Enviar
+                                    </a>
                                     {% endif %}
                                 </td>
                             </tr>

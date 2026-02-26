@@ -1,21 +1,29 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
-    User, CostCenter, TravelRequest, Expense,
+    User, Grupo, CostCenter, TravelRequest, Expense,
     VehicleType, VehicleTrip, VehicleLog, Approval, Attachment
 )
+
+
+@admin.register(Grupo)
+class GrupoAdmin(admin.ModelAdmin):
+    """Administração de Grupos"""
+    list_display = ['nome', 'ativo']
+    list_filter = ['ativo']
+    search_fields = ['nome', 'descricao']
 
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     """Administração de usuários customizada"""
-    list_display = ['username', 'email', 'first_name', 'last_name', 'user_type', 'cargo', 'is_active']
-    list_filter = ['user_type', 'is_staff', 'is_active']
+    list_display = ['username', 'email', 'first_name', 'last_name', 'user_type', 'grupo', 'cargo', 'is_active']
+    list_filter = ['user_type', 'grupo', 'is_staff', 'is_active']
     search_fields = ['username', 'email', 'first_name', 'last_name', 'cargo']
 
     fieldsets = BaseUserAdmin.fieldsets + (
         ('Informações Adicionais', {
-            'fields': ('user_type', 'cargo', 'telefone')
+            'fields': ('user_type', 'grupo', 'cargo', 'telefone')
         }),
         ('Dados Bancários', {
             'fields': ('conta_corrente', 'agencia', 'banco')

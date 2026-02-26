@@ -5,6 +5,21 @@ from django.core.exceptions import ValidationError
 from decimal import Decimal
 
 
+class Grupo(models.Model):
+    """Grupo/Departamento para controle de aprovação hierárquica"""
+    nome = models.CharField(max_length=200, unique=True, verbose_name='Nome')
+    descricao = models.TextField(blank=True, verbose_name='Descrição')
+    ativo = models.BooleanField(default=True, verbose_name='Ativo')
+
+    class Meta:
+        verbose_name = 'Grupo'
+        verbose_name_plural = 'Grupos'
+        ordering = ['nome']
+
+    def __str__(self):
+        return self.nome
+
+
 class User(AbstractUser):
     """
     Modelo customizado de usuário com perfis específicos:
@@ -26,6 +41,15 @@ class User(AbstractUser):
     )
     cargo = models.CharField(max_length=200, verbose_name='Cargo')
     telefone = models.CharField(max_length=20, blank=True, verbose_name='Telefone')
+    grupo = models.ForeignKey(
+        Grupo,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='usuarios',
+        verbose_name='Grupo',
+        help_text='Grupo/departamento do usuário. Aprovadores só podem aprovar viagens de usuários do mesmo grupo.'
+    )
 
     # Dados bancários para reembolso
     conta_corrente = models.CharField(max_length=20, blank=True, verbose_name='Conta Corrente')
